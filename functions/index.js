@@ -10,7 +10,7 @@ exports.onOrderStatusUpdate = onDocumentUpdated("orders/{orderId}", async (event
     const previousValue = event.data.before.data();
 
     // Only trigger if status changed to DELIVERED
-    if (newValue.status === "DELIVERED" && previousValue.status !== "DELIVERED") {
+    if (newValue.status !== previousValue.status) {
         const userId = newValue.userId;
         const orderId = newValue.orderId;
 
@@ -35,7 +35,7 @@ exports.onOrderStatusUpdate = onDocumentUpdated("orders/{orderId}", async (event
                     priority: "high",
                     notification: {
                         channel_id: "orders_channel", // Ensure this matches your Android Channel ID
-                        icon: "stock_ticker_update",
+                        icon: "ic_launcher",
                         color: "#7e5233"
                     }
                 }
