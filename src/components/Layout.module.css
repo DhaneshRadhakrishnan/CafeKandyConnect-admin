@@ -1,0 +1,76 @@
+.shell {
+  display: flex;
+  height: 100vh;
+  background-color: var(--surface);
+  font-family: 'DM Sans', sans-serif;
+}
+
+.sidebar {
+  width: 260px;
+  background-color: var(--surface2);
+  border-right: 1px solid var(--surface3);
+  display: flex;
+  flex-direction: column;
+  padding: 1.5rem;
+}
+
+.logo {
+  font-family: 'Space Mono', monospace;
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: var(--gold);
+  margin-bottom: 2rem;
+  padding-left: 0.5rem;
+  letter-spacing: -0.5px;
+}
+
+.sidebar nav {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  flex-grow: 1;
+}
+
+.link {
+  text-decoration: none;
+  color: var(--muted);
+  padding: 0.8rem 1rem;
+  border-radius: 10px;
+  transition: all 0.2s ease;
+  font-weight: 500;
+  font-size: 14px;
+}
+
+.link:hover {
+  background-color: var(--surface3);
+  color: var(--text);
+}
+
+.active {
+  background-color: var(--roast) !important;
+  color: #ffffff !important;
+}
+
+.logout {
+  margin-top: auto;
+  background: transparent;
+  border: 1px solid var(--surface3);
+  padding: 0.75rem;
+  border-radius: 10px;
+  cursor: pointer;
+  color: var(--red);
+  font-weight: 600;
+  font-family: 'DM Sans', sans-serif;
+  transition: all 0.2s;
+}
+
+.logout:hover {
+  background-color: rgba(229, 115, 115, 0.1);
+  border-color: var(--red);
+}
+
+.main {
+  flex-grow: 1;
+  padding: 2rem;
+  overflow-y: auto;
+}
