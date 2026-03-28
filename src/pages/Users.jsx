@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { db } from '../firebase'; // Adjust path based on your config
+import { db } from '../firebase';
 import { collection, getDocs } from 'firebase/firestore';
 
 const Users = () => {
@@ -10,29 +10,21 @@ const Users = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        // Load users and orders in parallel to calculate order counts
         const [uSnap, oSnap] = await Promise.all([
           getDocs(collection(db, "users")),
           getDocs(collection(db, "orders"))
         ]);
-
-        // Build an orderCount map (userId → count)
         const orderCountMap = {};
         oSnap.forEach(doc => {
           const data = doc.data();
           const uid = data.userId;
-          if (uid) {
-            orderCountMap[uid] = (orderCountMap[uid] || 0) + 1;
-          }
+          if (uid) orderCountMap[uid] = (orderCountMap[uid] || 0) + 1;
         });
-
-        // Merge counts into user objects
         const userData = uSnap.docs.map(doc => ({
           id: doc.id,
           ...doc.data(),
           orderCount: orderCountMap[doc.id] || 0
         }));
-
         setUsers(userData);
       } catch (error) {
         console.error("Error fetching users:", error);
@@ -40,7 +32,6 @@ const Users = () => {
         setLoading(false);
       }
     };
-
     fetchData();
   }, []);
 
@@ -50,48 +41,48 @@ const Users = () => {
     u.id?.toLowerCase().includes(search.toLowerCase())
   );
 
-  if (loading) return <div className="p-6 text-center">Loading users...</div>;
+  if (loading) return <div className="loading">Loading users...</div>;
 
   return (
-    <div className="p-6">
-      <div className="flex justify-between items-center mb-6">
-        <h1 className="text-2xl font-bold">User Management</h1>
+    <div>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 24 }}>
+        <h2>User Management</h2>
         <input
           type="text"
           placeholder="Search by name, email, or UID..."
-          className="border p-2 rounded w-64"
           value={search}
-          onChange={(e) => setSearch(e.target.value)}
+          onChange={e => setSearch(e.target.value)}
+          style={{ background: 'var(--surface3)', border: '1px solid var(--surface3)', borderRadius: 8, padding: '8px 14px', color: 'var(--text)', fontSize: 13, width: 280 }}
         />
       </div>
 
-      <div className="bg-white rounded-lg shadow overflow-hidden">
-        <table className="w-full text-left">
-          <thead className="bg-gray-50 border-b">
+      <div className="card" style={{ padding: 0, overflow: 'hidden' }}>
+        <table>
+          <thead>
             <tr>
-              <th className="p-4">User</th>
-              <th className="p-4">Email</th>
-              <th className="p-4">UID</th>
-              <th className="p-4 text-center">Total Orders</th>
+              <th>User</th>
+              <th>Email</th>
+              <th>UID</th>
+              <th style={{ textAlign: 'center' }}>Total Orders</th>
             </tr>
           </thead>
           <tbody>
             {filteredUsers.map(user => (
-              <tr key={user.id} className="border-b hover:bg-gray-50">
-                <td className="p-4 flex items-center gap-3">
-                  <img 
-                    src={user.profileImage || `https://ui-avatars.com/api/?name=${user.name || 'User'}`} 
-                    alt="avatar" 
-                    className="w-10 h-10 rounded-full object-cover bg-gray-200"
-                  />
-                  <span className="font-medium">{user.name || 'Anonymous'}</span>
+              <tr key={user.id}>
+                <td>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+                    <img
+                      src={user.profilePicUrl || `https://ui-avatars.com/api/?name=${user.name || 'User'}&background=8F4C34&color=fff`}
+                      alt="avatar"
+                      style={{ width: 36, height: 36, borderRadius: '50%', objectFit: 'cover' }}
+                    />
+                    <span style={{ fontWeight: 600 }}>{user.name || 'Anonymous'}</span>
+                  </div>
                 </td>
-                <td className="p-4 text-gray-600">{user.email || 'N/A'}</td>
-                <td className="p-4 text-xs font-mono text-gray-400">
-                  {user.id.substring(0, 12)}...
-                </td>
-                <td className="p-4 text-center">
-                  <span className="bg-blue-100 text-blue-700 px-3 py-1 rounded-full text-sm font-bold">
+                <td style={{ color: 'var(--muted)' }}>{user.email || 'N/A'}</td>
+                <td style={{ fontFamily: 'monospace', fontSize: 11, color: 'var(--muted)' }}>{user.id.substring(0, 12)}...</td>
+                <td style={{ textAlign: 'center' }}>
+                  <span style={{ background: 'rgba(128,203,196,.2)', color: 'var(--blue)', padding: '3px 12px', borderRadius: 20, fontSize: 12, fontWeight: 700 }}>
                     {user.orderCount}
                   </span>
                 </td>
@@ -100,7 +91,7 @@ const Users = () => {
           </tbody>
         </table>
         {filteredUsers.length === 0 && (
-          <div className="p-10 text-center text-gray-500">No users found matching your search.</div>
+          <div style={{ padding: 40, textAlign: 'center', color: 'var(--muted)' }}>No users found matching your search.</div>
         )}
       </div>
     </div>

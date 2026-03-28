@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { db } from '../firebase';
 import { collection, getDocs, addDoc, deleteDoc, doc, query, orderBy } from 'firebase/firestore';
-import useImageUpload from '../hooks/useImageUpload'; // Assuming your custom hook path
+import useImageUpload from '../hooks/useImageUpload';
 
 const Promos = () => {
   const [promos, setPromos] = useState([]);
@@ -9,10 +9,9 @@ const Promos = () => {
   const [preview, setPreview] = useState("");
   const [orderNum, setOrderNum] = useState("");
   const [isUploading, setIsUploading] = useState(false);
-  
+
   const { uploadImage } = useImageUpload();
 
-  // Load existing promos sorted by order field
   useEffect(() => {
     const fetchPromos = async () => {
       const q = query(collection(db, "promos"), orderBy("order", "asc"));
@@ -22,11 +21,9 @@ const Promos = () => {
     fetchPromos();
   }, []);
 
-  // Handle image selection and preview cleanup
-  const handleFileChange = (e) => {
+  const handleFileChange = e => {
     const file = e.target.files[0];
     if (!file) return;
-
     setImageFile(file);
     if (preview) URL.revokeObjectURL(preview);
     setPreview(URL.createObjectURL(file));
@@ -36,105 +33,73 @@ const Promos = () => {
     return () => { if (preview) URL.revokeObjectURL(preview); };
   }, [preview]);
 
-  const handleAddPromo = async (e) => {
+  const handleAddPromo = async e => {
     e.preventDefault();
     if (!imageFile || isUploading) return;
-
     setIsUploading(true);
     try {
-      const fileName = `promos/${Date.now()}_${imageFile.name}`;
-      const url = await uploadImage(imageFile, fileName);
-      
+      const url = await uploadImage(imageFile, `promos/${Date.now()}_${imageFile.name}`);
       const newOrder = parseInt(orderNum) || 99;
-      const docRef = await addDoc(collection(db, "promos"), {
-        imageUrl: url,
-        order: newOrder
-      });
-
-      // Update local state and re-sort
-      setPromos(prev => [...prev, { id: docRef.id, imageUrl: url, order: newOrder }]
-        .sort((a, b) => a.order - b.order));
-
-      // Reset form
+      const docRef = await addDoc(collection(db, "promos"), { imageUrl: url, order: newOrder });
+      setPromos(prev => [...prev, { id: docRef.id, imageUrl: url, order: newOrder }].sort((a, b) => a.order - b.order));
       setImageFile(null);
       setPreview("");
       setOrderNum("");
     } catch (err) {
-      console.error("Upload failed:", err);
       alert("Failed to upload promo image.");
     } finally {
       setIsUploading(false);
     }
   };
 
-  const handleDelete = async (id) => {
-    if (!window.confirm("Remove this promo slide? It will disappear from the app immediately.")) return;
+  const handleDelete = async id => {
+    if (!window.confirm("Remove this promo slide?")) return;
     try {
       await deleteDoc(doc(db, "promos", id));
       setPromos(prev => prev.filter(p => p.id !== id));
-    } catch (err) {
+    } catch {
       alert("Error deleting promo.");
     }
   };
 
   return (
-    <div className="p-6">
-      <h1 className="text-2xl font-bold mb-6">Carousel Promos</h1>
+    <div>
+      <h2 style={{ marginBottom: 24 }}>Carousel Promos</h2>
 
-      {/* Upload Section */}
-      <form onSubmit={handleAddPromo} className="bg-white p-6 rounded-lg shadow-sm border mb-8 max-w-2xl">
-        <h2 className="text-sm font-semibold text-gray-500 uppercase mb-4">Add New Slide</h2>
-        <div className="flex flex-col md:flex-row gap-4 items-start">
-          <div className="flex-1">
-            <input 
-              type="file" 
-              accept="image/*" 
-              onChange={handleFileChange} 
-              className="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"
-            />
+      <form onSubmit={handleAddPromo}>
+        <div className="card" style={{ marginBottom: 24, display: 'flex', gap: 16, alignItems: 'flex-end', flexWrap: 'wrap' }}>
+          <div style={{ flex: 1, minWidth: 200 }}>
+            <div style={{ fontSize: 11, color: 'var(--muted)', textTransform: 'uppercase', letterSpacing: '.5px', marginBottom: 8 }}>Image</div>
+            <input type="file" accept="image/*" onChange={handleFileChange} style={{ color: 'var(--text)', fontSize: 13 }} />
             {preview && (
-              <div className="mt-3 relative inline-block">
-                <img src={preview} alt="preview" className="w-48 h-28 object-cover rounded-lg border shadow-sm" />
-                <p className="text-[10px] text-gray-400 mt-1 italic text-center">Preview only</p>
-              </div>
+              <img src={preview} alt="preview" style={{ marginTop: 12, width: 120, height: 70, objectFit: 'cover', borderRadius: 8, border: '1px solid var(--surface3)' }} />
             )}
           </div>
-          
-          <div className="w-32">
-            <input 
-              type="number" 
-              placeholder="Order (1, 2...)" 
+          <div style={{ width: 120 }}>
+            <div style={{ fontSize: 11, color: 'var(--muted)', textTransform: 'uppercase', letterSpacing: '.5px', marginBottom: 8 }}>Order</div>
+            <input
+              type="number"
+              placeholder="1, 2, 3..."
               value={orderNum}
-              onChange={(e) => setOrderNum(e.target.value)}
-              className="border p-2 rounded w-full"
+              onChange={e => setOrderNum(e.target.value)}
+              style={{ width: '100%', background: 'var(--surface3)', border: '1px solid var(--surface3)', borderRadius: 8, padding: '8px 12px', color: 'var(--text)', fontSize: 13 }}
             />
           </div>
-
-          <button 
-            type="submit"
-            disabled={!imageFile || isUploading}
-            className={`px-6 py-2 rounded font-medium text-white transition ${isUploading ? 'bg-gray-400' : 'bg-green-600 hover:bg-green-700'}`}
-          >
+          <button type="submit" disabled={!imageFile || isUploading} className="btn-primary">
             {isUploading ? "Uploading..." : "Add Slide"}
           </button>
         </div>
       </form>
 
-      {/* Grid Display */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {promos.map((promo) => (
-          <div key={promo.id} className="bg-white border rounded-xl overflow-hidden shadow-sm group relative">
-            <img src={promo.imageUrl} alt="promo" className="w-full h-40 object-cover" />
-            <div className="p-3 flex justify-between items-center bg-gray-50">
-              <span className="text-xs font-bold bg-blue-500 text-white px-2 py-1 rounded">
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(220px, 1fr))', gap: 16 }}>
+        {promos.map(promo => (
+          <div key={promo.id} className="card" style={{ padding: 0, overflow: 'hidden' }}>
+            <img src={promo.imageUrl} alt="promo" style={{ width: '100%', height: 140, objectFit: 'cover' }} />
+            <div style={{ padding: '10px 14px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+              <span style={{ background: 'rgba(245,188,111,.2)', color: 'var(--gold)', padding: '3px 10px', borderRadius: 20, fontSize: 11, fontWeight: 700 }}>
                 Order: {promo.order}
               </span>
-              <button 
-                onClick={() => handleDelete(promo.id)}
-                className="text-red-500 hover:text-red-700 text-sm font-medium"
-              >
-                Delete
-              </button>
+              <button className="btn-danger btn-sm" onClick={() => handleDelete(promo.id)}>Delete</button>
             </div>
           </div>
         ))}
