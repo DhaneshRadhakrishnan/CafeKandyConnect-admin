@@ -1,4 +1,4 @@
-# ☕ CaféKandy Connect — Admin Panel
+#  CaféKandy Connect — Admin Panel
 
 > A sleek, dark-themed React dashboard for managing the CaféKandy mobile ordering platform — built with Vite, Firebase, and zero compromise on aesthetics.
 
