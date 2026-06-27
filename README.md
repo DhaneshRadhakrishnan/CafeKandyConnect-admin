@@ -87,7 +87,7 @@ cafekandy-admin/
 ### Installation
 
 ```bash
-git clone https://github.com/your-username/cafekandy-admin.git
+git clone https://github.com/DhaneshRadhakrishnan/cafekandy-admin.git
 cd cafekandy-admin
 npm install
 ```
