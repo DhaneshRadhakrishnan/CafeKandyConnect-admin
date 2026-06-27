@@ -15,7 +15,6 @@ exports.onOrderStatusUpdate = onDocumentUpdated("orders/{orderId}", async (event
         const orderId = newValue.orderId;
 
         try {
-            // 1. Fetch the user's FCM token from the 'users' collection
             const userDoc = await getFirestore().collection("users").doc(userId).get();
             const fcmToken = userDoc.data()?.fcmToken;
 
@@ -24,7 +23,6 @@ exports.onOrderStatusUpdate = onDocumentUpdated("orders/{orderId}", async (event
                 return null;
             }
 
-            // 2. Construct the message for FCM V1
             const message = {
                 token: fcmToken,
                 notification: {
@@ -34,14 +32,13 @@ exports.onOrderStatusUpdate = onDocumentUpdated("orders/{orderId}", async (event
                 android: {
                     priority: "high",
                     notification: {
-                        channel_id: "orders_channel", // Ensure this matches your Android Channel ID
+                        channel_id: "orders_channel", 
                         icon: "ic_launcher",
                         color: "#7e5233"
                     }
                 }
             };
 
-            // 3. Send the notification
             const response = await getMessaging().send(message);
             console.log("Successfully sent message:", response);
         } catch (error) {

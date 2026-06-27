@@ -134,7 +134,7 @@ const Orders = () => {
         minHeight: '150px' 
       }}
       /* Changed size to 400x150 in the URL below */
-      src={`https://maps.googleapis.com/maps/api/staticmap?center=${selected.shippingAddress.latitude},${selected.shippingAddress.longitude}&zoom=15&size=400x150&markers=color:red%7C${selected.shippingAddress.latitude},${selected.shippingAddress.longitude}&key=AIzaSyCI2ntHtdY0_G-nvJSxb8Xi6vAjPpC3OgM`}
+      src={`https://maps.googleapis.com/maps/api/staticmap?center=${selected.shippingAddress.latitude},${selected.shippingAddress.longitude}&zoom=15&size=400x150&markers=color:red%7C${selected.shippingAddress.latitude},${selected.shippingAddress.longitude}&key=${import.meta.env.VITE_FIREBASE_API_KEY}`}
       alt="Delivery Map"
       onError={(e) => {
          console.error("Map Error. Attempted URL:", e.target.src);

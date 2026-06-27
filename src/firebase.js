@@ -4,7 +4,7 @@ import { getFirestore } from "firebase/firestore";
 import { getStorage }   from "firebase/storage";
 
 const firebaseConfig = {
-  apiKey:            "AIzaSyAaAThqWw3YLfd9e2_XVltDA_LqHZ2phSc",
+  apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
   authDomain:        "cafe-kandy-connect.firebaseapp.com",
   projectId:         "cafe-kandy-connect",
   storageBucket:     "cafe-kandy-connect.firebasestorage.app",

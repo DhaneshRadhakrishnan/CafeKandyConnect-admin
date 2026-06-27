@@ -11,17 +11,15 @@ import Orders     from "./pages/Orders";
 import Users      from "./pages/Users";
 import Promos     from "./pages/Promos";
 
-const ADMIN_UID = "rAP2QohPqfSTqMwNLyWMjfqPLYS2"; // 👈 Paste it here
+const ADMIN_UID = import.meta.env.VITE_ADMIN_UID;
 
 function ProtectedRoute({ user, loading, children }) {
   if (loading) return <div className="loading">Brewing...</div>;
 
-// Only allow if logged in AND the UID matches your Admin account
   if (user && user.uid === ADMIN_UID) {
     return children;
   }
 
-  // If someone else logs in, or no one is logged in, send to login
   return <Navigate to="/login" replace />;
 }
 
